@@ -20,4 +20,7 @@ v1.0
 
 v1.1 
 - Added support for crops and spraying sessions
+
+v1.2
+- Added savings algorthm, graph support, more metric displays
 '''
