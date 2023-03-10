@@ -8,8 +8,8 @@ _/ ____\____ _______  _____             ____    ____
 
 Quote Calculator v2023.02
 Creator: Ryan Dinubilo
-Created On: 3/4/23
-Revised: 3/9/23+
+Created: 3/4/23
+Revised: 3/9/23
 
 Changelog:
 v1.0
@@ -17,7 +17,11 @@ v1.0
 
 v1.1 
 - Added support for crops and spraying sessions
+
+v1.2
+- Added savings algorthm, graph support, more metric displays
 '''
+
 
 #Import Libraries
 import streamlit as st
@@ -35,8 +39,9 @@ links = st.sidebar.write("To learn more, visit our [website](https://farm-ng.com
 
 #Calculation Variables and User Input
 acres = st.sidebar.slider("Acres covered", 1, 2000)
+acresInt = int(acres)
 
-cropType = st.sidebar.selectbox("What type of crop?", ["Apples", "Blueberries", "Cane Berries", "Cannabis", "Cherries", "Citrus", "Hops", "Pollen Application", "Row Crops (Strawberries)", "Table Grapes", "Tree Nuts", "Wine Grapes"])
+cropType = st.sidebar.selectbox("What type of crop?", ["🍎 Apples", "Blueberries", "Cane Berries", "Cannabis", "Cherries", "Citrus", "Hops", "Pollen Application", "Row Crops (Strawberries)", "Table Grapes", "Tree Nuts", "Wine Grapes"])
 
 advancedSettings = st.sidebar.checkbox("Advanced Settings")
 
@@ -73,10 +78,19 @@ if advancedSettings:
   milesofRowPerAcreUser = st.sidebar.number_input("Miles of Row per Acre (default=0.79 mi/acre)", value=0.79)
   operationSpeedUser = st.sidebar.number_input("Operation Speed (default=2 mph)", value=2)
 
+  humanCostPerHourUser = st.sidebar.number_input("Human Operating Cost Per Hour (default=$24.50)", value=24.5)
+
 
 calculateButton = st.sidebar.button("Calculate")
 
 if calculateButton:
+
+    #Savings algorithm
+    N = acres
+    
+    df = pd.DataFrame({ 'Acres covered (acres)' : range(1, N + 1, 1), 
+                        'Original Cost ($)' : np.linspace(9.7, N*9.7 +1, N),
+                        'Amiga Cost ($)' : np.linspace(3.2, N*3.2+1, N)})
 
     #calculations
     orchardMiles = acres*milesOfRowPerAcre
@@ -96,6 +110,9 @@ if calculateButton:
     #Driver cost per operation
     driverTotalCost = acres*humanTotalCost
 
+    #Number of drivers needed to complete operation
+    driversNeeded = acres/8
+
     #input display
     col1, col2 = st.columns(2)
     col1.metric("Acres covered", acres)
@@ -106,10 +123,29 @@ if calculateButton:
 
     #First row of columns for miles to traverse full orchard
     col1, col2 = st.columns(2)
-    col1.metric("Miles to traverse full orchard", millify(orchardMiles))
-    col2.metric("Hours to traverse full orchard", millify(ttcOrchard))
+    col1.metric("Miles to traverse full orchard", millify(orchardMiles), help=f"Covering {acres} acres at 0.79 miles of standard 12ft row per acre")
+    col2.metric("Hours to traverse full orchard", millify(ttcOrchard), help=f'At an operation speed of 2 mph')
 
+    st.write('##')
     #Second row of columns for cost 
     col1, col2 = st.columns(2)
     humanCost = round(humanTotalCost, 2)
-    col1.metric("Human Operating Cost Per Acre", f'$ {humanCost}')
+    col1.metric(label="👤 Driver Operating Cost Per Acre", value=f'$ {humanCost}', help=f'Hours to traverse orchard divided by orchard size, times the driver pay per hour')
+
+    driverTotal = humanCost*acres
+    driverTotalRoudned =round(driverTotal,2)
+    col2.metric("Total Driver Operating Cost", f'$ {driverTotalRoudned}')
+
+    st.write('##')
+    #Third row of columns for cost 
+    col1, col2 = st.columns(2)
+    tractorCostPerHour = (ttcOrchard/acres)*tractorOverheadPerHour
+    tractorCostPerHourRounded = round(tractorCostPerHour, 2)
+    col1.metric("🚜 Tractor Operating Cost Per Acre", f'$ {tractorCostPerHourRounded}', help=f'Hours to traverse orchard divided by orchard size, times the tractor cost per hour')
+
+    tractorTotal = tractorOverheadPerHour*acres
+    tractorTotalRoudned =round(tractorTotal,2)
+    col2.metric("Total Tractor Operating Cost", f'$ {tractorTotalRoudned}')
+
+    #Area graph of cost
+    st.area_chart(data=df, x="Acres covered (acres)")
