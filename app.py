@@ -89,8 +89,8 @@ if calculateButton:
     N = acres
     
     df = pd.DataFrame({ 'Acres covered (acres)' : range(1, N + 1, 1), 
-                        'Original Cost ($)' : np.linspace(9.7, N*9.7 +1, N),
-                        'Amiga Cost ($)' : np.linspace(3.2, N*3.2+1, N)})
+                        'Original Cost ($)' : np.linspace(13.79, N*13.79 +1, N),
+                        'Amiga Cost ($)' : np.linspace(2.63, N*2.63+1, N)})
 
     #calculations
     orchardMiles = acres*milesOfRowPerAcre
@@ -113,13 +113,28 @@ if calculateButton:
     #Number of drivers needed to complete operation
     driversNeeded = acres/8
 
+    #Calculations
+    amigaCostPerAcre = (ttcOrchard/acres)*6.67
+    amigaCostPerHourRounded = round(amigaCostPerAcre, 2)
+    amigaTotal = amigaCostPerAcre*acres
+    amigaTotalRounded = round(amigaTotal)
+
+    tractorCostPerHour = (ttcOrchard/acres)*tractorOverheadPerHour
+    tractorCostPerHourRounded = round(tractorCostPerHour, 2)
+
+    tractorTotal = tractorOverheadPerHour*acres
+    tractorTotalRoudned =round(tractorTotal)
+
+    #Difference savings
+    savings = tractorTotal - amigaTotal
+    savingsRounded = round(savings)
+
+    st.header(f"You save: :green[${savingsRounded}]")
+
     #input display
     col1, col2 = st.columns(2)
     col1.metric("Acres covered", acres)
     col2.metric("Crop Type", cropType)
-
-    #Line break
-    st.write("##")
 
     #First row of columns for miles to traverse full orchard
     col1, col2 = st.columns(2)
@@ -127,24 +142,26 @@ if calculateButton:
     col2.metric("Hours to traverse full orchard", millify(ttcOrchard), help=f'At an operation speed of 2 mph')
 
     st.write('##')
-    #Second row of columns for cost 
-    col1, col2 = st.columns(2)
-    humanCost = round(humanTotalCost, 2)
-    col1.metric(label="👤 Driver Operating Cost Per Acre", value=f'$ {humanCost}', help=f'Hours to traverse orchard divided by orchard size, times the driver pay per hour')
 
-    driverTotal = humanCost*acres
-    driverTotalRoudned =round(driverTotal,2)
-    col2.metric("Total Driver Operating Cost", f'$ {driverTotalRoudned}')
+    #Amiga Calculation
+    #Third row of columns for cost 
+    col1, col2 = st.columns(2)
+    col1.metric("🦾 Amiga Cost Per Acre", f'$ {amigaCostPerHourRounded}')
+    col2.metric("🦾 Total Amiga Operating Cost", f'$ {amigaTotalRounded}', help=f'Total amiga cost, divided by a 10 year lifetime with 300 work-hours per year')
+    
+    # #Second row of columns for cost 
+    # col1, col2 = st.columns(2)
+    # humanCost = round(humanTotalCost, 2)
+    # col1.metric(label="👤 Driver Operating Cost Per Acre", value=f'$ {humanCost}', help=f'Hours to traverse orchard divided by orchard size, times the driver pay per hour')
+
+    # driverTotal = humanCost*acres
+    # driverTotalRoudned =round(driverTotal,2)
+    # col2.metric("Total Driver Operating Cost", f'$ {driverTotalRoudned}')
 
     st.write('##')
     #Third row of columns for cost 
     col1, col2 = st.columns(2)
-    tractorCostPerHour = (ttcOrchard/acres)*tractorOverheadPerHour
-    tractorCostPerHourRounded = round(tractorCostPerHour, 2)
     col1.metric("🚜 Tractor Operating Cost Per Acre", f'$ {tractorCostPerHourRounded}', help=f'Hours to traverse orchard divided by orchard size, times the tractor cost per hour')
-
-    tractorTotal = tractorOverheadPerHour*acres
-    tractorTotalRoudned =round(tractorTotal,2)
     col2.metric("Total Tractor Operating Cost", f'$ {tractorTotalRoudned}')
 
     #Area graph of cost
