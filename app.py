@@ -97,15 +97,12 @@ if calculateButton:
 
     #hours to travers full orchard
     ttcOrchard = orchardMiles/operationSpeed
-    print(ttcOrchard)
 
     #drivers required to complete operation
     driversRequired = ttcOrchard/humanWorkingHours
-    print(driversRequired)
 
     #Human cost to complete operation
     humanTotalCost = (ttcOrchard/acres)*(humanOperatorCostPerHour)
-    print(humanTotalCost)
 
     #Driver cost per operation
     driverTotalCost = acres*humanTotalCost
@@ -129,7 +126,7 @@ if calculateButton:
     savings = tractorTotal - amigaTotal
     savingsRounded = round(savings)
 
-    st.header(f"You save: :green[${savingsRounded}]")
+    st.header(f"You save: :green[${savingsRounded}] by switching to the Amiga platform")
 
     #input display
     col1, col2 = st.columns(2)
@@ -146,8 +143,8 @@ if calculateButton:
     #Amiga Calculation
     #Third row of columns for cost 
     col1, col2 = st.columns(2)
-    col1.metric("🦾 Amiga Cost Per Acre", f'$ {amigaCostPerHourRounded}')
-    col2.metric("🦾 Total Amiga Operating Cost", f'$ {amigaTotalRounded}', help=f'Total amiga cost, divided by a 10 year lifetime with 300 work-hours per year')
+    col1.metric("🦾 Amiga Cost Per Acre", f'$ {amigaCostPerHourRounded}', help=f'Total amiga cost, divided by a 10 year lifetime with 300 work-hours per year')
+    col2.metric("🦾 Total Amiga Operating Cost", f'$ {amigaTotalRounded}', help=f'Covering {acres} acres at $2.63 per acre')
     
     # #Second row of columns for cost 
     # col1, col2 = st.columns(2)
@@ -162,7 +159,7 @@ if calculateButton:
     #Third row of columns for cost 
     col1, col2 = st.columns(2)
     col1.metric("🚜 Tractor Operating Cost Per Acre", f'$ {tractorCostPerHourRounded}', help=f'Hours to traverse orchard divided by orchard size, times the tractor cost per hour')
-    col2.metric("Total Tractor Operating Cost", f'$ {tractorTotalRoudned}')
+    col2.metric("Total Tractor Operating Cost", f'$ {tractorTotalRoudned}', help=f'Covering {acres} acres at $13.79 per acre')
 
     #Area graph of cost
     st.area_chart(data=df, x="Acres covered (acres)")
